@@ -1,19 +1,21 @@
-# Next.js Example
+# Next.js example
 
-This directory is a brief example of a [Next.js](https://nextjs.org) app that can be deployed to ZEIT Now with zero configuration.
+## How to use
 
-## How we created this example
+Download the example [or clone the repo](https://github.com/mui-org/material-ui):
 
-To get started with Next.js on Now, you can use [npm create](https://www.npmjs.com/package/create-next-app) to initialize the project:
-
-```shell
-$ npm create next-app my-app
+```sh
+curl https://codeload.github.com/mui-org/material-ui/tar.gz/master | tar -xz --strip=2  material-ui-master/examples/nextjs
+cd nextjs
 ```
 
-## Deploying this Example
+Install it and run:
 
-Once initialized, you can deploy the Next.js example with just a single command:
-
-```shell
-$ now
+```sh
+npm install
+npm run dev
 ```
+
+## The idea behind the example
+
+[Next.js](https://github.com/zeit/next.js) is a framework for server-rendered React apps.
