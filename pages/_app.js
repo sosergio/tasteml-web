@@ -16,7 +16,7 @@ class MyApp extends App {
 
   render() {
     const { Component, pageProps } = this.props;
-
+    console.log("_app.js", pageProps)
     return (
       <Container>
         <Head>
@@ -25,6 +25,7 @@ class MyApp extends App {
         <ThemeProvider theme={theme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
+          
           <Component {...pageProps} />
         </ThemeProvider>
       </Container>

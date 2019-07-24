@@ -20,13 +20,16 @@ function MadeWithLove() {
 
 export default function Index() {
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="lg">
       <Box my={4}>
         <Typography variant="h4" component="h1" gutterBottom>
           Next.js v4-beta example
         </Typography>
         <Link href="/about" color="secondary">
           Go to the about page
+        </Link>
+        <Link href="/wine-select" color="secondary">
+          Go to the wine select page
         </Link>
         <ProTip />
         <MadeWithLove />
