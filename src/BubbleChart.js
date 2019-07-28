@@ -81,20 +81,14 @@ class BubbleChart extends Component {
         const nodes = root.descendants();
 
         let getSelect = d3.select(node)
-            .call(d3.zoom().on('zoom', (d,x,c) => {
-                console.log('on zoom: ', d, x, c, d3.event, d3.event.transform, d3.event.scale)
-                var transform = d3.event.transform;
-                transform.x = Math.min(0, transform.x);
-                transform.y = Math.min(0, transform.y);
-
-                // getSelect.attr("transform", transform.toString());
-                d3.select(node)
-                    .attr("transform", transform.toString());
-                    // .selectAll('circle')
-                    // .attr("transform", function (d) {
-                    //     return `translate(${d.x},${d.y}) scale(${transform.k}))`;
-                    // });
-            }))
+            // .call(d3.zoom().on('zoom', (d,x,c) => {
+            //     console.log('on zoom: ', d, x, c, d3.event, d3.event.transform, d3.event.scale)
+            //     var transform = d3.event.transform;
+            //     transform.x = Math.min(0, transform.x);
+            //     transform.y = Math.min(0, transform.y);
+            //     d3.select(node)
+            //         .attr("transform", transform.toString());
+            // }))
             .selectAll('circle')
             .data(nodes.slice(1))
             .enter()
@@ -112,15 +106,30 @@ class BubbleChart extends Component {
             .style('fill-opacity', d => d.children ? 0.2 : 1)
             .style("fill", (d) => d.children ? color(this.getBiggestChild(d.children)): color(d.data.name))
             ;
+        
+        // getSelect.append("image")
+        //     .attr('xlink:href', d => (d.children || d.data.size < 100) ? null : `https://winefolly-wpengine.netdna-ssl.com/wp-content/uploads/wines/icons/flavors/${d.data.name}.svg`)
+        //     .attr('x', d => -d.data.size/14)
+        //     .attr('y', d => -d.data.size/14)
+        //     .attr('width', d => d.data.size/7 )
+        //     .attr('height', d => d.data.size/7)
+        //     .attr('fill', '#000');
 
         getSelect.append("text")
             .attr("dy", ".3em")
-            .attr("font-size", "10px")
+            .attr("font-size", (d) => `${d.data.size/35}px`)
             .style("text-anchor", "middle")
-            .text((d) => d.data.name);
+            //.text(d => d.children ? null : d.data.name.length > 10 ? d.data.name.substring(0,8) : d.data.name);
+            .text(d => d.children ? null : d.data.name);
+        
+        // getSelect.append("text")
+        //     .attr("dy", ".3em")
+        //     .attr("font-size", (d) => `${d.data.size/35}px`)
+        //     .style("text-anchor", "middle")
+        //     .text(d => (d.children || d.data.name.length) < 10 ? null : d.data.name.substring(8, d.data.name.length));
 
-        getSelect.append("title")
-            .text((d) => d.data.name);
+        // getSelect.append("title")
+        //     .text((d) => d.data.name);
     }
 
     onNodeSelect = (refData, i, nodes) => {
