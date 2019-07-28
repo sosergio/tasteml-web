@@ -10,17 +10,26 @@ const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
     flexWrap: 'wrap',
+    flexDirection: 'row',
+    padding:'10px'
   },
   formControl: {
-    margin: theme.spacing(1),
+    //margin: theme.spacing(1),
     minWidth: 120,
+    
   },
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
-  rangeContainer: {
-    width: 300
+  input: {
+    color: 'white'
+  },
+  flex1:{
+    flex:1
   }
+  // rangeContainer: {
+  //   width: 300
+  // }
 }));
 
 function valuetext(value) {
@@ -31,7 +40,7 @@ export default function WineFilters({onChange}) {
   const classes = useStyles();
   const [state, setState] = React.useState({
     country: '',
-    price: [5, 50]
+    price: [0, 50]
   });
 
   const commitChange = name => (event, newValue) => {
@@ -52,27 +61,52 @@ export default function WineFilters({onChange}) {
 
   return (
     <div className={classes.root}>
-        <div>
+        <div className={classes.flex1}>
+        <Typography id="price-slider1" gutterBottom>
+                Country
+            </Typography>
             <FormControl className={classes.formControl}>
-                <InputLabel htmlFor="country-select">Country</InputLabel>
+                {/* <InputLabel htmlFor="country-select">Country</InputLabel> */}
                 <Select
-                native
-                value={state.country}
-                onChange={commitChange('country')}
-                inputProps={{
-                    name: 'country',
-                    id: 'country-select',
-                }}
-                >
-                <option value='' />
-                <option value='italy'>Italy</option>
-                <option value='france'>France</option>
-                <option value='us'>USA</option>
-                <option value='portugal'>Portugal</option>
+                  native
+                  value={state.country}
+                  onChange={commitChange('country')}
+                  inputProps={{
+                      name: 'country',
+                      id: 'country-select',
+                  }}
+                  >
+                  <option value='' >All</option>
+                  <option value='italy'>Italy</option>
+                  <option value='france'>France</option>
+                  <option value='us'>USA</option>
+                  <option value='portugal'>Portugal</option>
                 </Select>
             </FormControl>
         </div>
-        <div className={classes.rangeContainer}>
+        {/* <div>
+            <FormControl className={classes.formControl}>
+                <InputLabel htmlFor="price-ranges">Price</InputLabel>
+                <Select
+                  native
+                  value={state.price}
+                  onChange={commitChange('price')}
+                  inputProps={{
+                      name: 'price',
+                      id: 'price-select',
+                  }}
+                  >
+                  <option value='' />
+                  <option value={[0,10]}>Inexpensive</option>
+                  <option value={[50]}>Medium</option>
+                  <option value={[50,100]}>Expensive</option>
+                  <option value={[100,1000]}>Luxury</option>
+                </Select>
+            </FormControl> 
+            
+        </div> */}
+
+        <div className={classes.flex1}>
             <Typography id="price-slider" gutterBottom>
                 Price
             </Typography>
@@ -83,7 +117,7 @@ export default function WineFilters({onChange}) {
                 valueLabelDisplay="auto"
                 aria-labelledby="price-slider"
                 getAriaValueText={valuetext}
-                valueLabelDisplay="on"
+                valueLabelDisplay="auto"
             />
         </div>
     </div>

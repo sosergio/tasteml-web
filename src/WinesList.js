@@ -10,14 +10,15 @@ import InfoIcon from '@material-ui/icons/Info';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    
+    display: 'flex',
+    flexWrap: 'wrap',
     justifyContent: 'space-around',
     overflow: 'hidden',
     backgroundColor: theme.palette.background.paper,
   },
   gridList: {
-    width: 500,
-    height: 450,
+    // width: 500,
+   // height: '100vh',
   },
   gridListTile:{
     backgroundColor: 'lightgray'
@@ -34,7 +35,7 @@ const useStyles = makeStyles(theme => ({
   gridImg: {
     transform: 'translateY(-38%) translateX(-49%)',
     top: '50%',
-    width: '125%',
+    width: '75%',
     position: 'relative'
 }
 }));
@@ -47,10 +48,9 @@ function resolveImage(wineVariety){
 
 export default function WinesList({data}) {
   const classes = useStyles();
-  console.log("WinesList", data)
   return (
     <div className={classes.root}>
-      <GridList cellHeight={180} className={classes.gridList}>
+      <GridList cellHeight={180} className={classes.gridList} cols={1}>
         {data && data.map(tile => (
           <GridListTile key={tile._id} className={classes.gridListTile}>
             <img className={classes.gridImg} src={resolveImage(tile.variety)} alt={tile.variety} />
