@@ -13,7 +13,7 @@ import ClustersChart from '../src/ClustersChart';
 import fetch from 'isomorphic-unfetch';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-const baseUrl = "http://tasteml-api.herokuapp.com";
+const baseUrl = "https://tasteml-api.herokuapp.com";
 
 const getWines = async (country, minPrice, maxPrice, cluster) => {
   const clusterFilter = cluster ? `&sort=to_${cluster}`: '';
