@@ -12,6 +12,8 @@ import WineFilters from '../src/WineFilters';
 import ClustersChart from '../src/ClustersChart';
 import fetch from 'isomorphic-unfetch';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Dialog from '@material-ui/core/Dialog';
+import About from './about';
 
 const baseUrl = "https://tasteml-api.herokuapp.com";
 
@@ -106,8 +108,21 @@ const styles = theme => ({
   }
 });
 
+function WineDetailDialog(props) {
+  const { onClose, selectedValue, open } = props;
 
-class IndexPage extends Component {
+  function handleClose() {
+    onClose();
+  }
+
+  return (
+    <Dialog onClose={handleClose} open={open}>
+      <About id={selectedValue}></About>
+    </Dialog>
+  );
+}
+
+class Index extends Component {
   
   constructor(props) {
     super();
@@ -116,7 +131,9 @@ class IndexPage extends Component {
       loadingWines: true,
       loadingClusters: true,
       loadingTastes: true,
-      wineData: []
+      wineData: [],
+      selectedWineId: null,
+      isModalOpen:false
     };
   }
 
@@ -171,6 +188,19 @@ class IndexPage extends Component {
     })
   };
 
+  onWineSelected = (id) => {
+    this.setState({
+      selectedWineId: id,
+      isModalOpen:true
+    })
+  }
+
+  closeModal = () => {
+    this.setState({
+      isModalOpen:false
+    })
+  }
+
   render(){
     const { classes } = this.props;
     return (
@@ -201,7 +231,7 @@ class IndexPage extends Component {
             </div>
             <div className={classes.drawerListContainer}>
               { this.state.loadingWines ? <div className={classes.progressContainer}> <CircularProgress className={classes.progress}/></div> : 
-                  <WinesList data={this.state.wineData}/> 
+                  <WinesList data={this.state.wineData} onWineSelected={this.onWineSelected}/> 
               }
             </div>
           </div>
@@ -211,9 +241,10 @@ class IndexPage extends Component {
               <ClustersChart data={this.state.clusters} tastes={this.state.tastes} onClusterSelected={this.onClusterSelected}></ClustersChart>
           }
         </main>
+        <WineDetailDialog selectedValue={this.state.selectedWineId} open={this.state.isModalOpen} onClose={this.closeModal} />
       </div>
     );
     }
 }
 
-export default withStyles(styles)(IndexPage);
+export default withStyles(styles)(Index);

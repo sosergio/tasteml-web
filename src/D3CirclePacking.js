@@ -11,8 +11,21 @@ class D3CirclePacking {
     this.props = props;
     const {
       width,
-      height
+      height,
+      selectedName,
+      data
     } = props;
+
+    const packLayout = d3.pack()
+      .size([width, height])
+      .padding((d) => d.height === 0 ? 0 : (d.height === 1 ? 10 : 100));
+
+    const root = d3.hierarchy(data)
+      .sum(d => d.size)
+      .sort((a, b) => a.value - b.value);
+
+    packLayout(root);
+    this.descendants = root.descendants();
 
     this.svg = d3.select(containerEl)
       .append('svg')
@@ -38,26 +51,15 @@ class D3CirclePacking {
 
   getColorForNode = (d) => d.children ? this.getColorFromTasteName(this.getBiggestChild(d.children)) : this.getColorFromTasteName(d.data.name)
 
+  isNodeSelected = (d) => d && d.children && this.props.selectedName == d.data.name;
+
   updateDatapoints = () => {
     const {
-      data,
-      width,
-      height
-    } = this.props;
+      descendants,
+    } = this;
     
-    const packLayout = d3.pack()
-      .size([width, height])
-      .padding((d) => d.height === 0 ? 0 : (d.height === 1 ? 10 : 100));
-
-    const root = d3.hierarchy(data)
-      .sum(d => d.size)
-      .sort((a, b) => a.value - b.value);
-
-    packLayout(root);
-    const nodes = root.descendants();
-
     let getSelect = this.svg.selectAll('circle')
-      .data(nodes.slice(1))
+      .data(descendants.slice(1))
       .enter()
       .append("g")
       .attr("class", "node")
@@ -71,7 +73,9 @@ class D3CirclePacking {
       .attr('r', d => d.r)
       .style('padding', '0px')
       .style('fill-opacity', d => d.children ? 0.5 : 1)
-      .style("fill", (d) => this.getColorForNode(d));
+      .style("fill", d => this.getColorForNode(d))
+      .style('stroke', d => this.isNodeSelected(d) ? 'black' : null)
+      .style('stroke-width',  d => this.isNodeSelected(d) ? '20' : null);
 
     getSelect.append("text")
       .attr("dy", ".3em")
@@ -81,8 +85,6 @@ class D3CirclePacking {
   }
 
   onNodeMouseUp = (d) => {
-    //d3.select(node).style('fill', 'yellow');
-    console.log(d)
     if(this.props.onNodeSelect) this.props.onNodeSelect(d);
   }
 
@@ -92,6 +94,16 @@ class D3CirclePacking {
     } = this;
     svg.attr('width', width)
       .attr('height', height);
+  }
+
+
+  setSelected = (name) => {
+    console.log('D3CirclePacking setSelected with name', name)
+    this.props.selectedName = name;
+    d3.selectAll("circle")
+      .style('stroke', d => this.isNodeSelected(d) ?  this.getColorForNode(d): null)
+      .style('stroke-width',  d => this.isNodeSelected(d) ? '8' : null)
+      .style('stroke-opacity',  d => this.isNodeSelected(d) ? '0.7' : null)
   }
 }
 

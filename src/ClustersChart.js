@@ -62,7 +62,8 @@ class ClustersChart extends Component {
   initVis = () => {
     const {
       data,
-      tastes
+      tastes,
+      selectedName
     } = this.state;
     const width = this.visWidth;
     const height = this.visHeight;
@@ -73,6 +74,7 @@ class ClustersChart extends Component {
           tastes,
           width,
           height,
+          selectedName : '2',
           onNodeSelect: this.onNodeSelect
         };
         console.log('d3Circle init')
@@ -99,6 +101,7 @@ class ClustersChart extends Component {
     }
     // domNode.style('fill', 'yellow')
     if(d){
+        if(this.vis) this.vis.setSelected(d.name);
         if(this.props.onClusterSelected)
             this.props.onClusterSelected(d.name);
     }
@@ -109,6 +112,10 @@ class ClustersChart extends Component {
     const { classes } = this.props;
     return ( 
     <div className={classes.root}>
+     
+     
+
+
       <div ref={node => this.refElement = node}/>
     </div>
   )}

@@ -6,7 +6,8 @@ import GridListTileBar from '@material-ui/core/GridListTileBar';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/Info';
-
+import Link from '../src/Link';
+import WinesBottles from './WinesBottles'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -41,12 +42,16 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function resolveImage(wineVariety){
-  const imgs = ['red-1','red-2','red-3','white-1','white-2','white-4'];
-  const ix = Math.floor(Math.random() * 6);
-  return `static/sil/${imgs[ix]}.png`
+  let name = WinesBottles[wineVariety];
+  if (!name){
+    const imgs = ['red-1','red-2','red-3','white-1','white-2','white-4'];
+    const ix = Math.floor(Math.random() * 6);
+    name = imgs[ix]
+  }
+  return `static/sil/${name}.png`
 }
 
-export default function WinesList({data}) {
+export default function WinesList({data, onWineSelected}) {
   const classes = useStyles();
   return (
     <div className={classes.root}>
@@ -58,9 +63,12 @@ export default function WinesList({data}) {
               title={tile.title}
               subtitle={<span>{tile.variety} {tile.price}$</span>}
               actionIcon={
-                <IconButton aria-label={`info about ${tile.title}`} className={classes.icon}>
-                  <InfoIcon />
-                </IconButton>
+                // <Link href={`/about?id=${tile._id}`}>
+                  <IconButton aria-label={`info about ${tile.title}`} className={classes.icon}
+                    onClick={() =>  onWineSelected(tile._id) }>
+                    <InfoIcon />
+                  </IconButton>
+                // </Link>
               }
             />
           </GridListTile>
