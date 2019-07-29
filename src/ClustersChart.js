@@ -1,91 +1,117 @@
-import React, { Component } from 'react'
-import * as d3 from "d3";
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+import D3CirclePacking from './D3CirclePacking';
 import { withStyles } from '@material-ui/core/styles';
-import CirclePacking from './CirclePacking'
 
 const styles = theme => ({
-    root:{
-        background:'radial-gradient(#f1f4f7, #091426)'
-    }
-  });
+  root:{}
+});
 
 class ClustersChart extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            data: this.props.data,
-            tastes: this.props.tastes,
-            zoomTransform: null
+  
+  visWidth = 2000;
+  visHeight = 2000;
+  constructor(props) {
+    super(props)
+    this.state = {
+        data: this.props.data,
+        tastes: this.props.tastes,
+        active: null
+    };
+    
+  }
+
+  componentDidMount() {
+    //this.setSizeFromParent();
+    this.initVis()
+    //this.registerOnPageResizeEventHandler()
+  }
+
+  shouldComponentUpdate() {
+    return true;
+  }
+
+  componentDidUpdate() {
+    //console.log('ClustersChart componentDidUpdate') 
+  }
+
+  setSizeFromParent = () => {
+    var parentNode =  ReactDOM.findDOMNode(this).parentElement;
+    this.visWidth = (parentNode && parentNode.offsetWidth) || 100;
+    this.visHeight = (parentNode && parentNode.offsetHeight) || 100;
+  }
+
+  registerOnPageResizeEventHandler = () => {
+    let resizeTimer;
+    this.handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        var parentNode =  ReactDOM.findDOMNode(this).parentElement;
+        this.visWidth = (parentNode && parentNode.offsetWidth) || 100;
+        this.visHeight = (parentNode && parentNode.offsetHeight) || 100;
+        this.updateVis();
+      }, 300);
+    };
+    window.addEventListener('resize', this.handleResize);
+
+    return () => {
+      window.removeEventListener('resize', this.handleResize);
+    };
+  }
+
+  initVis = () => {
+    const {
+      data,
+      tastes
+    } = this.state;
+    const width = this.visWidth;
+    const height = this.visHeight;
+    console.log(`initVis data:${data}, width:${width}, height:${height}`)
+      if (data) {
+        const d3Props = {
+          data,
+          tastes,
+          width,
+          height,
+          onNodeSelect: this.onNodeSelect
         };
-        
-        this.zoom = d3.zoom()
-                  .scaleExtent([-5, 5])
-                  .translateExtent([[-100, -100], [props.width+100, props.height+100]])
-                  .extent([[-100, -100], [props.width+100, props.height+100]])
-                  .on("zoom", this.zoomed.bind(this));
+        console.log('d3Circle init')
+        this.vis = new D3CirclePacking(this.refElement, d3Props);
+      }
+  }
+
+  updateVis = () => {
+    const {
+      data
+    } = this.state;
+    const width = this.visWidth;
+    const height = this.visHeight;
+    console.log(`updateVisOnResize data:${data}, width:${width}, height:${height}`)
+    this.vis && this.vis.resize(width, height);
+  }
+
+  onNodeSelect = (refData, i, nodes) => {
+    const isCluster = refData.depth === 1;
+    const d = isCluster ? refData.data : refData.parent.data;
+    //let domNode = d3.select(nodes[i]);
+    if(!isCluster) {
+        //const parentIndex = domNode.attrs['data-index'];
     }
-
-    packData(){
-        const {width, height} = this.props;
-        const packLayout = d3.pack()
-            .size([width, height])
-            .padding((d) => d.height === 0 ? 0 : (d.height === 1 ? 10 : 100)); //d.r / 0.35 : 3);
-
-        const root = d3.hierarchy(data)
-            .sum(d => d.size)
-            .sort((a, b) => a.value - b.value);
-
-        packLayout(root);
-        const nodes = root.descendants().slice(1);
-        this.setState({
-            ...this.state,
-            data: nodes
-        });
-
-        d3.select(this.refs.svg)
-          .call(this.zoom)
-    }
-
-    componentDidMount() {
-        this.packData();
-    }
-    componentDidUpdate() {
-        this.packData();
-    }
-
-    zoomed() {
-        this.setState({ 
-            ...this.state,
-            zoomTransform: d3.event.transform
-        });
-    }
-
-    onNodeSelect = () => {
-        const isCluster = refData.depth === 1;
-        const d = isCluster ? refData.data : refData.parent.data;
-        // let domNode = d3.select(nodes[i]);
-        if(!isCluster) {
-            //const parentIndex = domNode.attrs['data-index'];
-        }
-        // domNode.style('fill', 'yellow')
-        if(d){
-            if(this.props.onClusterSelected)
-                this.props.onClusterSelected(d.name);
-        }
-    }
-
-    render() {
-        const { zoomTransform } = this.state,
-            { classes, width, height } = this.props;
-        return ( 
-            <svg className={classes.root} width={width} height={height} ref="svg">
-                <CirclePacking data={this.state.data}
-                            x={0} y={0} 
-                            width={width}
-                            height={height}
-                            zoomTransform={zoomTransform} />
-            </svg>
-        );
+    // domNode.style('fill', 'yellow')
+    if(d){
+        if(this.props.onClusterSelected)
+            this.props.onClusterSelected(d.name);
     }
 }
+
+
+  render(){
+    const { classes } = this.props;
+    return ( 
+    <div className={classes.root}>
+      <div ref={node => this.refElement = node}/>
+    </div>
+  )}
+}
+
 export default withStyles(styles)(ClustersChart);

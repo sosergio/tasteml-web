@@ -7,15 +7,13 @@ import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import React, { Component } from 'react'
 import { withStyles } from '@material-ui/core/styles';
-
-import Container from '@material-ui/core/Container';
-import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
 import WinesList from '../src/WinesList';
 import WineFilters from '../src/WineFilters';
-import BubbleChart from '../src/BubbleChart';
+import ClustersChart from '../src/ClustersChart';
 import fetch from 'isomorphic-unfetch';
 import CircularProgress from '@material-ui/core/CircularProgress';
+
+const baseUrl = "http://tasteml-api.herokuapp.com";
 
 const getWines = async (country, minPrice, maxPrice, cluster) => {
   const clusterFilter = cluster ? `&sort=to_${cluster}`: '';
@@ -24,18 +22,18 @@ const getWines = async (country, minPrice, maxPrice, cluster) => {
   const maxPriceFilter = maxPrice ? `&max_price=${maxPrice}`: '';
   let qs = clusterFilter+countryFilter+minPriceFilter+maxPriceFilter;
   if(qs.length > 0) qs = "?" + qs.substring(1, qs.length);
-  const res = await fetch(`http://localhost:3000/tasting-notes${qs}`)
+  const res = await fetch(`${baseUrl}/tasting-notes${qs}`)
   return await res.json()
 };
 
 const getClusters = async () => {
-    const res = await fetch(`http://localhost:3000/clusters/hierarchical`)
+    const res = await fetch(`${baseUrl}/clusters/hierarchical`)
     const root =  await res.json()
     return root;
 };
 
 const getTastes = async () => {
-  const res = await fetch(`http://localhost:3000/tastes`)
+  const res = await fetch(`${baseUrl}/tastes`)
   const array =  await res.json()
   let hashmap = {};
   for(let t of array)
@@ -80,6 +78,7 @@ const styles = theme => ({
     flexGrow: 1,
     height: '100vh',
     overflow: 'auto',
+    display: 'flex'
   },
   drawerRoot:{
     zIndex:1,
@@ -91,14 +90,20 @@ const styles = theme => ({
     flexDirection: 'column'
   },
   drawerToolbarContainer:{
-    flex: '0 0 auto',
-    //background: 'radial-gradient(#091C33, #091426)',
-    //color: 'white'
+    flex: '0 0 auto'
   },
   drawerListContainer:{
     flex: '1 1 auto',
-    overflowY: 'auto'
+    overflowY: 'auto',
+    
   },
+  progressContainer:{
+    display:'flex',
+    height: '100%'
+  },
+  progress:{
+    margin: 'auto'
+  }
 });
 
 
@@ -117,24 +122,22 @@ class IndexPage extends Component {
 
   componentDidMount() {
     console.log('componentDidMount')
-    this.loadWines();
+    this.loadWines({});
     this.loadClusters();
     this.loadTastes();
   }
 
   toggleDrawer = () => {
     this.setState({
-      ...this.state,
       open:!this.state.open
     })
   }
 
-  loadWines(){
-    let { country, minPrice, maxPrice, cluster } = this.state;
-    getWines(country, minPrice, maxPrice, cluster)
+  loadWines({ country, minPrice, maxPrice, cluster }){
+    this.setState({loadingWines : true})
+     getWines(country, minPrice, maxPrice, cluster)
       .then(newWines =>{
         this.setState({
-          ...this.state,
           loadingWines: false,
           wineData: newWines.items.slice(0,5)
         })});
@@ -142,7 +145,6 @@ class IndexPage extends Component {
 
   loadClusters(){
     getClusters().then(clusters => this.setState({
-      ...this.state,
       loadingClusters: false,
       clusters
     }))
@@ -150,28 +152,23 @@ class IndexPage extends Component {
 
   loadTastes(){
     getTastes().then(tastes => this.setState({
-      ...this.state,
       loadingTastes: false,
       tastes
     }))
   }
   
   onFiltersChange = (newValue) => {
-    this.setState({
-      ...this.state,
+    this.loadWines({
       country: newValue.country,
       minPrice: newValue.price[0],
       maxPrice: newValue.price[1]
     })
-    this.loadWines();
   };
 
   onClusterSelected = (newValue) => {
-    this.setState({
-      ...this.state,
+    this.loadWines({
       cluster: newValue
     })
-    this.loadWines();
   };
 
   render(){
@@ -203,16 +200,16 @@ class IndexPage extends Component {
               <WineFilters onChange={this.onFiltersChange}></WineFilters>
             </div>
             <div className={classes.drawerListContainer}>
-              { this.state.loadingWines ? <CircularProgress/> : 
+              { this.state.loadingWines ? <div className={classes.progressContainer}> <CircularProgress className={classes.progress}/></div> : 
                   <WinesList data={this.state.wineData}/> 
               }
             </div>
           </div>
         </Drawer>
         <main className={classes.content}>
-        { this.state.loadingClusters || this.state.loadingTastes ? <CircularProgress/> : 
-              <BubbleChart data={this.state.clusters} tastes={this.state.tastes} onClusterSelected={this.onClusterSelected}></BubbleChart>
-            }
+          { this.state.loadingClusters || this.state.loadingTastes ? <CircularProgress className={classes.progress}/>: 
+              <ClustersChart data={this.state.clusters} tastes={this.state.tastes} onClusterSelected={this.onClusterSelected}></ClustersChart>
+          }
         </main>
       </div>
     );

@@ -32,6 +32,10 @@ class BubbleChart extends Component {
         this.createBubbleChart()
     }
 
+    shouldComponentUpdate() {
+        return false;
+      }
+
     componentDidUpdate() {
         this.createBubbleChart()
     }
@@ -46,30 +50,26 @@ class BubbleChart extends Component {
     }
 
     createBubbleChart() {
+        console.log('createBubbleChart')
         const node = this.node;
         const data = this.state.data;
         const formatNumber = d3.format(",d");
         
-        // var parentNode =  ReactDOM.findDOMNode(this).parentElement;
-        // var parentWidth = (parentNode && parentNode.offsetWidth) || 100;
-        // var parentHeigth = (parentNode && parentNode.offsetHeight) || 100;
-        // this.w = parentWidth;
-        // this.h = parentHeigth;  
-        // this.r = parentWidth
+        var parentNode =  ReactDOM.findDOMNode(this).parentElement;
+        var parentWidth = (parentNode && parentNode.offsetWidth) || 100;
+        var parentHeigth = (parentNode && parentNode.offsetHeight) || 100;
+        const chartW = 2000, chartY = 2000;
 
-        // // Ranges
-        // this.x = d3.scaleLinear().range([0, this.r]);
-        // this.y = d3.scaleLinear().range([0, this.r]);
         const svg = d3.select(node)
-            .attr("width", 2000)
-            .attr("height", 2000)
+            .attr("width", chartW)
+            .attr("height", chartY)
             //.attr('transform', `translate(-${parentWidth/2},-${parentHeigth}) scale(0.5)`)
         
         //const color = d3.scaleOrdinal(d3.schemeCategory10);
         const color = name => this.state.tastes[name]? this.state.tastes[name][0] : '#000';
 
         const packLayout = d3.pack()
-            .size([2000, 2000])
+            .size([chartW, chartY])
             .padding((d) => d.height === 0 ? 0 : (d.height === 1 ? 10 : 100)); //d.r / 0.35 : 3);
 
         const root = d3.hierarchy(data)
@@ -80,12 +80,50 @@ class BubbleChart extends Component {
         packLayout(root);
         const nodes = root.descendants();
 
+
+        /*
+        <defs id="mdef">
+            <pattern id="image" x="0" y="0" height="40" width="40">
+            <image x="0" y="0" width="40" height="40" xlink:href="spills/1.png"></image>
+            </pattern>
+        </defs>
+        <defs>
+            <pattern id="image" patternUnits="userSpaceOnUse" width="83.38" height="100" x="0" y="0">
+                <image xlink:href="https://goo.gl/kVVuy1" x="0" y="0" width="100%" height="100%" preserveAspectRatio="xMinYMin slice"/>
+            </pattern>
+        </defs>
+        */
+        d3.select(node)
+            .append('defs')
+            .attr('id', 'mdef')
+            .append('pattern')
+            .attr('id', 'spill_1')
+            .attr('patternUnits','userSpaceOnUse')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('height', '100%')
+            .attr('width', '100%')
+            .append('image')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('height', '100%')
+            .attr('width', '100%')
+            .attr('preserveAspectRatio','xMinYMin slice')
+            .attr('xlink:href', 'static/spills/1.png')
+        
+
         let getSelect = d3.select(node)
+        
+            // .call(d3.zoom().on('zoom', (d,x,c) => {
+            //     console.log('on zoom: ', d3.event)
+            //     d3.select(node)
+            //        .attr("transform", d3.event.transform)        
+            // }))
             // .call(d3.zoom().on('zoom', (d,x,c) => {
             //     console.log('on zoom: ', d, x, c, d3.event, d3.event.transform, d3.event.scale)
             //     var transform = d3.event.transform;
-            //     transform.x = Math.min(0, transform.x);
-            //     transform.y = Math.min(0, transform.y);
+            //     // transform.x = Math.min(0, transform.x);
+            //     // transform.y = Math.min(0, transform.y);
             //     d3.select(node)
             //         .attr("transform", transform.toString());
             // }))
@@ -103,8 +141,9 @@ class BubbleChart extends Component {
         getSelect.append("circle")
             .attr('r', d => d.r)
             .style('padding', '0px')
-            .style('fill-opacity', d => d.children ? 0.2 : 1)
+            .style('fill-opacity', d => d.children ? 0.5 : 1)
             .style("fill", (d) => d.children ? color(this.getBiggestChild(d.children)): color(d.data.name))
+            //.style("fill", (d) => d.children ? 'url(#spill_1)': color(d.data.name))
             ;
         
         // getSelect.append("image")
@@ -117,7 +156,7 @@ class BubbleChart extends Component {
 
         getSelect.append("text")
             .attr("dy", ".3em")
-            .attr("font-size", (d) => `${d.data.size/35}px`)
+            .attr("font-size", (d) => `${Math.max(d.data.size/35, 7)}px`)
             .style("text-anchor", "middle")
             //.text(d => d.children ? null : d.data.name.length > 10 ? d.data.name.substring(0,8) : d.data.name);
             .text(d => d.children ? null : d.data.name);
