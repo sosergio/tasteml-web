@@ -150,7 +150,8 @@ class Index extends Component {
     })
   }
 
-  loadWines({ country, minPrice, maxPrice, cluster }){
+  loadWines(){
+    const { country, minPrice, maxPrice, cluster } = this;
     this.setState({loadingWines : true})
      getWines(country, minPrice, maxPrice, cluster)
       .then(newWines =>{
@@ -175,17 +176,15 @@ class Index extends Component {
   }
   
   onFiltersChange = (newValue) => {
-    this.loadWines({
-      country: newValue.country,
-      minPrice: newValue.price[0],
-      maxPrice: newValue.price[1]
-    })
+    this.country = newValue.country;
+    this.minPrice = newValue.price[0];
+    this.maxPrice = newValue.price[1];
+    this.loadWines()
   };
 
   onClusterSelected = (newValue) => {
-    this.loadWines({
-      cluster: newValue
-    })
+    this.cluster = newValue;
+    this.loadWines()
   };
 
   onWineSelected = (id) => {
