@@ -5,7 +5,7 @@ import GridListTile from '@material-ui/core/GridListTile';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import IconButton from '@material-ui/core/IconButton';
 import InfoIcon from '@material-ui/icons/Info';
-import WinesBottles from '../services/WinesBottles'
+import bottlesImages from '../services/bottlesImages'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -39,16 +39,6 @@ const useStyles = makeStyles(theme => ({
 }
 }));
 
-function resolveImage(wineVariety){
-  let name = WinesBottles[wineVariety];
-  if (!name){
-    const imgs = ['red-1','red-2','red-3','white-1','white-2','white-4'];
-    const ix = Math.floor(Math.random() * 6);
-    name = imgs[ix]
-  }
-  return `static/sil/${name}.png`
-}
-
 export default function WinesList({data, onWineSelected}) {
   const classes = useStyles();
   return (
@@ -56,7 +46,7 @@ export default function WinesList({data, onWineSelected}) {
       <GridList cellHeight={180} className={classes.gridList} cols={1}>
         {data && data.map(tile => (
           <GridListTile key={tile._id} className={classes.gridListTile}>
-            <img className={classes.gridImg} src={resolveImage(tile.variety)} alt={tile.variety} />
+            <img className={classes.gridImg} src={bottlesImages(tile.variety)} alt={tile.variety} />
             <GridListTileBar
               title={tile.title}
               subtitle={<span>{tile.variety} {tile.price}$</span>}

@@ -1,4 +1,4 @@
-export default {
+const bottles = {
     "Aglianico": "red-2",
     "Albariño": "white-2",
     "Alvarinho": "white-2",
@@ -100,6 +100,21 @@ export default {
     "White Blend": "white-1",
     "Zinfandel": "red-2",
     "Zweigelt": "white-3",
-    "Prugnolo Gentile":"red-1",
-    "Bual":"red-1"
+    "Prugnolo Gentile": "red-1",
+    "Bual": "red-1",
+    "Cinsault": "red-1"
 }
+
+export default function bottlesImages(str) {
+    let match = bottles[str];
+    if (!match) {
+        for (let b in bottles) {
+            if (str.indexOf(b) > -1) {
+                match = bottles[b];
+                break;
+            }
+        }
+    }
+    if (!match) match = 'red-1';
+    return `static/sil/${match}.png`
+};
