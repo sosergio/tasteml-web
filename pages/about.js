@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
-import Link from '../src/Link';
+import Link from './../components/Link';
 import { withRouter } from 'next/router'
 import Chip from '@material-ui/core/Chip';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { withStyles } from '@material-ui/core/styles';
-
-import fetch from 'isomorphic-unfetch';
-
-const baseUrl = "https://tasteml-api.herokuapp.com";
+import TastemlApi from "./../services/tastemlApi";
 
 const styles = () => ({
   card: {
@@ -17,19 +14,11 @@ const styles = () => ({
   },
 });
 
-const getTastes = async () => {
-  const res = await fetch(`${baseUrl}/tastes`)
-  const array =  await res.json()
-  let hashmap = {};
-  for(let t of array)
-    hashmap[t.name]=  [t.primary, t.secondary]
-  return hashmap
-};
-
 class About extends Component {
   
   constructor({ router, props }) {
     super();
+    this.tastemlApi = new TastemlApi();
     this.state = {
       wine: null,
       tastes: []
@@ -38,23 +27,22 @@ class About extends Component {
 
   componentDidMount() {
     const id = this.props.id || this.props.router.query.id || this.props.router.asPath.replace('/about?id=','');
-    const url = `${baseUrl}/tasting-notes/${id}`;
-    getTastes().then(tastes => this.setState({
+    console.log(id)
+    
+    this.tastemlApi.getTastes().then(tastes => this.setState({
       tastes
     }))
-    
-    fetch(url)
-      .then(x => x.json())
-      .then(j => this.setState({
-        wine:j
-      }));
+
+    this.tastemlApi.getTastingNote(id).then(wine => this.setState({
+      wine
+    })) 
   }
 
   getColorFromTasteName = name => this.state.tastes[name] ? this.state.tastes[name][0] : '#fff';
 
   getFlavours(wine){
     let list = [];
-    const exclude = ['description', 'country', 'to_', 'designation', 'points', 'price', 'province', 'ratio', 'region_', 'taster_', 'title', 'variety', 'winery', '_id']
+    const exclude = ['description', 'country', 'to_', 'designation', 'points', 'price', 'province', 'ratio', 'region_', 'taster_', 'title', 'variety', 'winery', '_id', 'slug']
     for (var property in wine) {
       let found = exclude.find(x => property.indexOf(x) > -1)
       if (!found && wine.hasOwnProperty(property)) {

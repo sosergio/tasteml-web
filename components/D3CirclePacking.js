@@ -25,7 +25,7 @@ class D3CirclePacking {
       .sort((a, b) => a.value - b.value);
 
     packLayout(root);
-    this.descendants = root.descendants();
+    this.descendants = root.descendants().slice(1);
 
     this.svg = d3.select(containerEl)
       .append('svg')
@@ -39,10 +39,10 @@ class D3CirclePacking {
     this.updateDatapoints();
   }
 
-  getBiggestChild(children){
+  getBiggestChild(children) {
     let biggest = children[0];
-    for(let c of children){
-        if(c.data.size > biggest.data.size) biggest = c
+    for (let c of children) {
+      if (c.data.size > biggest.data.size) biggest = c
     }
     return biggest.data.name
   }
@@ -57,13 +57,36 @@ class D3CirclePacking {
     const {
       descendants,
     } = this;
-    
+
     let getSelect = this.svg.selectAll('circle')
-      .data(descendants.slice(1))
+      .data(descendants)
       .enter()
       .append("g")
       .attr("class", "node")
       .attr("data-index", (d, i, j) => i)
+      .on('mouseenter', function (d, i, nodes) {
+        if (!d.children) return
+        let node = d3.select(this);
+        const tx = node.attr('transform') + " scale(1.1,1.1)";
+        d3.select(this)
+          .transition()
+          //.ease(d3.easeBounce)           // control the speed of the transition
+          .duration(200)
+          .attr("transform", tx)
+      })
+      .on('mouseleave', function (d, i, nodes) {
+        if (!d.children) return
+        let node = d3.select(this);
+        let tx = node.attr('transform');
+        const ix = tx.indexOf('scale');
+        if (ix == -1) return
+        tx = tx.substring(0, ix);
+        d3.select(this)
+          .transition()
+          //.ease(d3.easeBounce)           // control the speed of the transition
+          .duration(200)
+          .attr("transform", tx)
+      })
       .on('mouseup', (d, i, nodes) => this.onNodeMouseUp(d, i, nodes[i]))
       .attr("transform", function (d) {
         return "translate(" + d.x + "," + d.y + ")";
@@ -74,8 +97,9 @@ class D3CirclePacking {
       .style('padding', '0px')
       .style('fill-opacity', d => d.children ? 0.5 : 1)
       .style("fill", d => this.getColorForNode(d))
-      .style('stroke', d => this.isNodeSelected(d) ? 'black' : null)
-      .style('stroke-width',  d => this.isNodeSelected(d) ? '20' : null);
+      .style('stroke', d => this.isNodeSelected(d) ? this.getColorForNode(d) : null)
+      .style('stroke-width', d => this.isNodeSelected(d) ? '8' : null)
+      .style('stroke-opacity', d => this.isNodeSelected(d) ? '0.7' : null)
 
     getSelect.append("text")
       .attr("dy", ".3em")
@@ -85,7 +109,7 @@ class D3CirclePacking {
   }
 
   onNodeMouseUp = (d) => {
-    if(this.props.onNodeSelect) this.props.onNodeSelect(d);
+    if (this.props.onNodeSelect) this.props.onNodeSelect(d);
   }
 
   resize = (width, height) => {
@@ -101,9 +125,10 @@ class D3CirclePacking {
     console.log('D3CirclePacking setSelected with name', name)
     this.props.selectedName = name;
     d3.selectAll("circle")
-      .style('stroke', d => this.isNodeSelected(d) ?  this.getColorForNode(d): null)
-      .style('stroke-width',  d => this.isNodeSelected(d) ? '8' : null)
-      .style('stroke-opacity',  d => this.isNodeSelected(d) ? '0.7' : null)
+      .transition()
+      .style('stroke', d => this.isNodeSelected(d) ? this.getColorForNode(d) : null)
+      .style('stroke-width', d => this.isNodeSelected(d) ? '8' : null)
+      .style('stroke-opacity', d => this.isNodeSelected(d) ? '0.7' : null)
   }
 }
 

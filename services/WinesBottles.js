@@ -83,6 +83,7 @@ export default {
     "Syrah": "red-2",
     "Sémillon": "white-1",
     "Tannat": "red-2",
+    "Tannat-Cabernet": "red-2",
     "Tempranillo": "red-1",
     "Tempranillo Blend": "red-1",
     "Tinta de Toro": "red-2",
@@ -101,5 +102,4 @@ export default {
     "Zweigelt": "white-3",
     "Prugnolo Gentile":"red-1",
     "Bual":"red-1"
-    
 }
