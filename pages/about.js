@@ -7,6 +7,7 @@ import Chip from '@material-ui/core/Chip';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { withStyles } from '@material-ui/core/styles';
 import TastemlApi from "./../services/tastemlApi";
+import { logPageView } from '../services/analytics'
 
 const styles = () => ({
   card: {
@@ -35,7 +36,7 @@ class About extends Component {
 
     this.tastemlApi.getTastingNote(id).then(wine => this.setState({
       wine
-    })) 
+    }))
   }
 
   getColorFromTasteName = name => this.state.tastes[name] ? this.state.tastes[name][0] : '#fff';

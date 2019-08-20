@@ -14,6 +14,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import Dialog from "@material-ui/core/Dialog";
 import About from "./about";
 import TastemlApi from "./../services/tastemlApi";
+import { logEvent, logPageView } from '../services/analytics';
 
 const drawerWidth = 340;
 
@@ -154,11 +155,13 @@ class Index extends Component {
     this.minPrice = newValue.price[0];
     this.maxPrice = newValue.price[1];
     this.loadWines();
+    logEvent('INDEX','onFiltersChange');
   };
 
   onClusterSelected = newValue => {
     this.cluster = newValue;
     this.loadWines();
+    logEvent('INDEX','onClusterSelected');
   };
 
   onWineSelected = id => {
@@ -166,6 +169,7 @@ class Index extends Component {
       selectedWineId: id,
       isModalOpen: true
     });
+    logEvent('INDEX','onWineSelected');
   };
 
   closeModal = () => {
