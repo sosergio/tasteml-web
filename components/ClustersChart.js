@@ -14,7 +14,7 @@ class ClustersChart extends Component {
     super(props);
     this.state = {
       data: this.props.data,
-      tastes: this.props.tastes,
+      flavours: this.props.flavours,
       active: null
     };
   }
@@ -58,14 +58,14 @@ class ClustersChart extends Component {
   };
 
   initVis = () => {
-    const { data, tastes, selectedName } = this.state;
+    const { data, flavours, selectedName } = this.state;
     const width = this.visWidth;
     const height = this.visHeight;
     console.log(`initVis data:${data}, width:${width}, height:${height}`);
     if (data) {
       const d3Props = {
         data,
-        tastes,
+        flavours,
         width,
         height,
         selectedName: "2",

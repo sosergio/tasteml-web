@@ -1,4 +1,6 @@
 import fetch from "isomorphic-unfetch";
+var tinycolor = require("tinycolor2");
+
 
 class TastemlApi {
   constructor() {
@@ -22,11 +24,15 @@ class TastemlApi {
     return root;
   }
 
-  async getTastes() {
+  async getFlavours() {
     const res = await fetch(`${this.baseUrl}/flavours`);
     const array = await res.json();
     let hashmap = {};
-    for (let t of array) hashmap[t.name] = [t.primary, t.secondary];
+    
+    for (let t of array) {
+      let textColor = tinycolor(t.primary).isDark() ? '#fff' : '#000';
+      hashmap[t.name] = [t.primary, textColor]
+    };
     return hashmap;
   }
 

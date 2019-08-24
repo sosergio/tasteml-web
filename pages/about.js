@@ -30,7 +30,7 @@ class About extends Component {
     const id = this.props.id || this.props.router.query.id || this.props.router.asPath.replace('/about?id=','');
     console.log(id)
     
-    this.tastemlApi.getTastes().then(tastes => this.setState({
+    this.tastemlApi.getFlavours().then(tastes => this.setState({
       tastes
     }))
 

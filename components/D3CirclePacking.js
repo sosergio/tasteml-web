@@ -47,8 +47,10 @@ class D3CirclePacking {
     return biggest.data.name
   }
 
-  getColorFromTasteName = name => this.props.tastes[name] ? this.props.tastes[name][0] : '#000';
+  getTextColorFromTasteName = name => this.props.flavours[name] ? this.props.flavours[name][1] : '#000';
+  getColorFromTasteName = name => this.props.flavours[name] ? this.props.flavours[name][0] : '#000';
 
+  getTextColorForNode = (d) => d.children ? this.getTextColorFromTasteName(this.getBiggestChild(d.children)) : this.getTextColorFromTasteName(d.data.name)
   getColorForNode = (d) => d.children ? this.getColorFromTasteName(this.getBiggestChild(d.children)) : this.getColorFromTasteName(d.data.name)
 
   isNodeSelected = (d) => d && d.children && this.props.selectedName == d.data.name;
@@ -105,6 +107,7 @@ class D3CirclePacking {
       .attr("dy", ".3em")
       .attr("font-size", (d) => `${Math.max(d.data.size/35, 7)}px`)
       .style("text-anchor", "middle")
+      .style("fill", d => this.getTextColorForNode(d))
       .text(d => d.children ? null : d.data.name);
   }
 

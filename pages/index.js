@@ -102,7 +102,7 @@ class Index extends Component {
       open: true,
       loadingWines: true,
       loadingClusters: true,
-      loadingTastes: true,
+      loadingFlavours: true,
       wineData: [],
       selectedWineId: null,
       isModalOpen: false
@@ -112,7 +112,7 @@ class Index extends Component {
   componentDidMount() {
     this.loadWines({});
     this.loadClusters();
-    this.loadTastes();
+    this.loadFlavours();
   }
 
   toggleDrawer = () => {
@@ -141,11 +141,11 @@ class Index extends Component {
     );
   }
 
-  loadTastes() {
-    this.tastemlApi.getTastes().then(tastes =>
+  loadFlavours() {
+    this.tastemlApi.getFlavours().then(flavours =>
       this.setState({
-        loadingTastes: false,
-        tastes
+        loadingFlavours: false,
+        flavours
       })
     );
   }
@@ -233,12 +233,12 @@ class Index extends Component {
           </div>
         </Drawer>
         <main className={classes.content}>
-          {this.state.loadingClusters || this.state.loadingTastes ? (
+          {this.state.loadingClusters || this.state.loadingFlavours ? (
             <CircularProgress className={classes.progress} />
           ) : (
             <ClustersChart
               data={this.state.clusters}
-              tastes={this.state.tastes}
+              flavours={this.state.flavours}
               onClusterSelected={this.onClusterSelected}
             />
           )}

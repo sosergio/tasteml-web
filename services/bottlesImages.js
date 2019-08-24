@@ -102,7 +102,8 @@ const bottles = {
     "Zweigelt": "white-3",
     "Prugnolo Gentile": "red-1",
     "Bual": "red-1",
-    "Cinsault": "red-1"
+    "Cinsault": "red-1",
+    "Traminer": "white-1"
 }
 
 export default function bottlesImages(str) {
